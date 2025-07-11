@@ -35,11 +35,12 @@
             const status = isBusy ? "BUSY" : "FREE";
             const className = isBusy ? "busy" : "free";
             html += `<tr class="${className}">
-                      <td>${row.Room}</td>
-                      <td>${row.Class || '-'}</td>
-                      <td>${start || ''} - ${end || ''}</td>
-                      <td>${status}</td>
-                    </tr>`;
+  <td>${row.Room}</td>
+  <td>${row.Class || '-'}</td>
+  <td>${row.Teacher || '-'}</td>
+  <td>${start || ''} - ${end || ''}</td>
+  <td>${status}</td>
+</tr>`;
           });
 
           document.getElementById("schedule").innerHTML = html;

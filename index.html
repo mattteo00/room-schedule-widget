@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Room Schedule</title>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial; background: #111; color: white; padding: 20px; }
+    h1 { text-align: center; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 10px; text-align: center; border: 1px solid #333; }
+    .busy { background: #ff4444; }
+    .free { background: #44cc44; }
+  </style>
+</head>
+<body>
+  <h1>Room Schedule</h1>
+  <table id="schedule"></table>
+
+  <script>
+    const apiUrl = "https://script.google.com/macros/s/AKfycbwGLjzEKYTIdCqr1-l-jBNgTELhedtX7c18iCKZGGRXqT1HHpL7cE_y_0K35M9EE45P/exec";
+
+    function fetchSchedule() {
+      fetch(apiUrl)
+        .then(res => res.json())
+        .then(data => {
+          const now = new Date();
+          const day = now.toLocaleDateString('en-US', { weekday: 'long' });
+          const currentTime = now.toTimeString().slice(0, 5);
+          let html = "<tr><th>Room</th><th>Class</th><th>Time</th><th>Status</th></tr>";
+
+          data.filter(row => row.Day === day).forEach(row => {
+            const start = row["Start Time"];
+            const end = row["End Time"];
+            const isBusy = start <= currentTime && currentTime <= end;
+            const status = isBusy ? "BUSY" : "FREE";
+            const className = isBusy ? "busy" : "free";
+            html += `<tr class="${className}">
+                      <td>${row.Room}</td>
+                      <td>${row.Class || '-'}</td>
+                      <td>${start || ''} - ${end || ''}</td>
+                      <td>${status}</td>
+                    </tr>`;
+          });
+
+          document.getElementById("schedule").innerHTML = html;
+        });
+    }
+
+    fetchSchedule();
+    setInterval(fetchSchedule, 60000); // Refresh every minute
+  </script>
+</body>
+</html>

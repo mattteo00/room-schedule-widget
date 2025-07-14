@@ -102,22 +102,27 @@
           const currentTime = now.toTimeString().slice(0, 5);
           let html ="<tr><th>Room</th><th>Class</th><th>Teacher</th><th>Time</th><th>Status</th></tr>";
 
-          data.filter(row => row.Day === day).forEach(row => {
-            const start = row["Start Time"];
-            const end = row["End Time"];
-            const isBusy = start <= currentTime && currentTime <= end;
-            const status = isBusy ? "BUSY" : "FREE";
-            const className = isBusy ? "busy" : "free";
+          data
+  .filter(row => {
+    const isToday = row.Day === day;
+    const end = row["End Time"];
+    return isToday && end >= currentTime;
+  })
+  .forEach(row => {
+    const start = row["Start Time"];
+    const end = row["End Time"];
+    const isBusy = start <= currentTime && currentTime <= end;
+    const status = isBusy ? "BUSY" : "FREE";
+    const className = isBusy ? "busy" : "free";
 
-            html += `<tr class="${className}">
-              <td>${row.Room}</td>
-              <td>${row.Class || '-'}</td>
-              <td>${row.Teacher || '-'}</td>
-              <td>${start || ''} - ${end || ''}</td>
-              <td>${status}</td>
-            </tr>`;
-          });
-
+    html += `<tr class="${className}">
+      <td>${row.Room}</td>
+      <td>${row.Class || '-'}</td>
+      <td>${row.Teacher || '-'}</td>
+      <td>${start || ''} - ${end || ''}</td>
+      <td>${status}</td>
+    </tr>`;
+  });
           document.getElementById("schedule").innerHTML = html;
         })
         .catch(error => {

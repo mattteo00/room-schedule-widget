@@ -1,94 +1,100 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Room Schedule</title>
-  <meta charset="UTF-8">
   <style>
-  body {
-    margin: 0;
-    padding: 60px 20px;
-    background: linear-gradient(to bottom right, #f0f2f5, #ffffff);
-    color: #1a1a1a;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  h1 {
-    font-size: 2.8rem;
-    font-weight: 500;
-    margin-bottom: 40px;
-    color: #2a2a2a;
-    letter-spacing: -0.5px;
-  }
-
-  table {
-    width: 95%;
-    max-width: 1100px;
-    border-collapse: separate;
-    border-spacing: 0 16px;
-    font-size: 1.15rem;
-    text-align: left;
-  }
-
-  th {
-    padding: 16px 20px;
-    background-color: transparent;
-    color: #555;
-    font-weight: 600;
-    font-size: 1rem;
-    text-transform: uppercase;
-    border-bottom: 2px solid #ddd;
-  }
-
-  td {
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(4px);
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
-    transition: all 0.3s ease;
-  }
-
-  tr.free td {
-    border-left: 6px solid #28a745;
-    color: #205c34;
-  }
-
-  tr.busy td {
-    border-left: 6px solid #dc3545;
-    color: #7c1a1a;
-  }
-
-  tr:hover td {
-    background: rgba(255, 255, 255, 0.95);
-    transform: translateY(-2px);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
-  }
-
-  @media (max-width: 768px) {
     body {
-      padding: 30px 10px;
+      margin: 0;
+      padding: 60px 20px;
+      background: linear-gradient(to bottom right, #f0f2f5, #ffffff);
+      color: #1a1a1a;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     h1 {
-      font-size: 2rem;
+      font-size: 2.8rem;
+      font-weight: 500;
+      margin-bottom: 40px;
+      color: #2a2a2a;
+      letter-spacing: -0.5px;
     }
 
     table {
-      font-size: 1rem;
+      width: 95%;
+      max-width: 1100px;
+      border-collapse: separate;
+      border-spacing: 0 16px;
+      font-size: 1.15rem;
+      text-align: left;
     }
 
-    td, th {
-      padding: 14px;
+    th {
+      padding: 16px 20px;
+      background-color: transparent;
+      color: #555;
+      font-weight: 600;
+      font-size: 1rem;
+      text-transform: uppercase;
+      border-bottom: 2px solid #ddd;
     }
-  }
-</style>
+
+    td {
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(4px);
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+      transition: all 0.3s ease;
+    }
+
+    tr.ongoing td {
+      border-left: 6px solid #28a745;
+      color: #205c34;
+    }
+
+    tr.upcoming td {
+      border-left: 6px solid #007bff;
+      color: #1a3f73;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.95);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 30px 10px;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      table {
+        font-size: 1rem;
+      }
+
+      td,
+      th {
+        padding: 14px;
+      }
+    }
+  </style>
 </head>
 <body>
   <h1>Room Schedule</h1>
-  <table id="schedule"></table>
+  <table id="schedule">
+    <tr>
+      <td colspan="5">Loading schedule...</td>
+    </tr>
+  </table>
 
   <script>
     const apiUrl = "https://script.google.com/macros/s/AKfycbwGLjzEKYTIdCqr1-l-jBNgTELhedtX7c18iCKZGGRXqT1HHpL7cE_y_0K35M9EE45P/exec";
@@ -98,41 +104,49 @@
         .then(res => res.json())
         .then(data => {
           const now = new Date();
-          const day = now.toLocaleDateString('en-US', { weekday: 'long' });
-          const currentTime = now.toTimeString().slice(0, 5);
-          let html ="<tr><th>Room</th><th>Class</th><th>Teacher</th><th>Time</th><th>Status</th></tr>";
+          const day = now.toLocaleDateString("en-US", { weekday: "long" });
+          const currentTime = now.toTimeString().slice(0, 5); // HH:MM
 
-          data
-  .filter(row => {
-    const isToday = row.Day === day;
-    const end = row["End Time"];
-    return isToday && end >= currentTime;
-  })
-  .forEach(row => {
-    const start = row["Start Time"];
-    const end = row["End Time"];
-    const isBusy = start <= currentTime && currentTime <= end;
-    const status = isBusy ? "BUSY" : "FREE";
-    const className = isBusy ? "busy" : "free";
+          let html =
+            "<tr><th>Room</th><th>Class</th><th>Teacher</th><th>Time</th><th>Status</th></tr>";
 
-    html += `<tr class="${className}">
-      <td>${row.Room}</td>
-      <td>${row.Class || '-'}</td>
-      <td>${row.Teacher || '-'}</td>
-      <td>${start || ''} - ${end || ''}</td>
-      <td>${status}</td>
-    </tr>`;
-  });
+          const filtered = data.filter(row => {
+            const isToday = row.Day === day;
+            const end = row["End Time"];
+            return isToday && end >= currentTime;
+          });
+
+          if (filtered.length === 0) {
+            html += `<tr><td colspan="5">No classes remaining today.</td></tr>`;
+          }
+
+          filtered.forEach(row => {
+            const start = row["Start Time"];
+            const end = row["End Time"];
+            const isOngoing =
+              start <= currentTime && currentTime <= end;
+            const status = isOngoing ? "Ongoing" : "Upcoming";
+
+            html += `<tr class="${isOngoing ? "ongoing" : "upcoming"}">
+              <td>${row.Room}</td>
+              <td>${row.Class}</td>
+              <td>${row.Teacher}</td>
+              <td>${start} – ${end}</td>
+              <td>${status}</td>
+            </tr>`;
+          });
+
           document.getElementById("schedule").innerHTML = html;
         })
-        .catch(error => {
-          console.error("Error fetching schedule:", error);
-          document.getElementById("schedule").innerHTML = "<tr><td colspan='5'>Failed to load data</td></tr>";
+        .catch(err => {
+          console.error("Error loading schedule:", err);
+          document.getElementById("schedule").innerHTML =
+            "<tr><td colspan='5'>Error loading data. Please try again later.</td></tr>";
         });
     }
 
     fetchSchedule();
-    setInterval(fetchSchedule, 60000); // Refresh every 1 minute
+    setInterval(fetchSchedule, 60000); // every 1 minute
   </script>
 </body>
 </html>

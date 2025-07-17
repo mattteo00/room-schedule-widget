@@ -22,6 +22,12 @@
       margin-bottom: 40px;
       color: #2a2a2a;
       letter-spacing: -0.5px;
+      text-align: center;
+    }
+
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
     }
 
     table {
@@ -31,6 +37,7 @@
       border-spacing: 0 16px;
       font-size: 1.15rem;
       text-align: left;
+      min-width: 600px;
     }
 
     th {
@@ -68,6 +75,7 @@
       box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
     }
 
+    /* Responsive adjustments */
     @media (max-width: 768px) {
       body {
         padding: 30px 10px;
@@ -86,15 +94,63 @@
         padding: 14px;
       }
     }
+
+    /* Fully stacked mobile layout */
+    @media (max-width: 600px) {
+      table,
+      thead,
+      tbody,
+      th,
+      td,
+      tr {
+        display: block;
+      }
+
+      th {
+        display: none;
+      }
+
+      tr {
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.9);
+        padding: 10px;
+      }
+
+      td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border: none;
+        border-bottom: 1px solid #eee;
+        box-shadow: none;
+        background: transparent;
+      }
+
+      td:last-child {
+        border-bottom: none;
+      }
+
+      td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #555;
+        margin-right: 10px;
+      }
+    }
   </style>
 </head>
 <body>
   <h1>Room Schedule</h1>
-  <table id="schedule">
-    <tr>
-      <td colspan="5">Loading schedule...</td>
-    </tr>
-  </table>
+  <div class="table-container">
+    <table id="schedule">
+      <tr>
+        <td colspan="5">Loading schedule...</td>
+      </tr>
+    </table>
+  </div>
 
   <script>
     const apiUrl = "https://script.google.com/macros/s/AKfycbwGLjzEKYTIdCqr1-l-jBNgTELhedtX7c18iCKZGGRXqT1HHpL7cE_y_0K35M9EE45P/exec";
@@ -128,11 +184,11 @@
             const status = isOngoing ? "Ongoing" : "Upcoming";
 
             html += `<tr class="${isOngoing ? "ongoing" : "upcoming"}">
-              <td>${row.Room}</td>
-              <td>${row.Class}</td>
-              <td>${row.Teacher}</td>
-              <td>${start} – ${end}</td>
-              <td>${status}</td>
+              <td data-label="Room">${row.Room}</td>
+              <td data-label="Class">${row.Class}</td>
+              <td data-label="Teacher">${row.Teacher}</td>
+              <td data-label="Time">${start} – ${end}</td>
+              <td data-label="Status">${status}</td>
             </tr>`;
           });
 
